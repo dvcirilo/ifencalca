@@ -10,7 +10,7 @@ const somaProduto = (a, b) => {
 // idx é o número da unidade - 1
 const isolaNota = (idx, notas, pesos, notaMin) => {
   const somaPesos = pesos.reduce((acc,cur) => acc + cur, 0);
-  return (somaPesos*notaMin - somaProduto(notas.toSpliced(idx,1), pesos.toSpliced(idx,1)))/pesos[idx];
+  return Math.round((somaPesos*notaMin - somaProduto(notas.toSpliced(idx,1), pesos.toSpliced(idx,1)))/pesos[idx]);
 }
 
 const calcFinal = function (notas, pesos, notaMin) {
@@ -38,37 +38,39 @@ document.getElementById("notaForm").addEventListener("submit", (event) => {
   const notaMin = 60;
   const pesos = [2,2,3,3];
   const notas = [
-    (parseFloat(document.getElementById("nota1").value) || 0),
-    (parseFloat(document.getElementById("nota2").value) || 0),
-    (parseFloat(document.getElementById("nota3").value) || 0),
-    (parseFloat(document.getElementById("nota4").value) || 0)
+    parseFloat(document.getElementById("nota1").value),
+    parseFloat(document.getElementById("nota2").value),
+    parseFloat(document.getElementById("nota3").value),
+    parseFloat(document.getElementById("nota4").value)
   ];
 
   let mesgResultado = "";
   let resultado;
 
-  if (isNaN(parseFloat(document.getElementById("nota4").value))) {
-    resultado = isolaNota(3, notas, pesos, notaMin);
-    mesgResultado = `📊 Você não forneceu a 4a nota.`;
+  const notasVazias = notas.map((el, idx) => isNaN(el));
+  if (notasVazias.filter((el) => el).length > 1) {
+    mesgResultado = `⛔ Você precisa fornecer pelo menos 3 notas!`;
+  } else if (notasVazias.filter((el) => el).length === 1) {
+    const notaVazia = notasVazias.indexOf(true);
+    mesgResultado = `📊 Você não forneceu a ${notaVazia+1}ª nota.`;
+    resultado = Math.round(isolaNota(notaVazia, notas, pesos, notaMin));
     if (resultado > 100) {
-      mesgResultado += `<br>⚠️ Você já está <strong>reprovado!</strong>`;
+      mesgResultado += `<br>⛔ Você já está na <strong>prova final!</strong>`;
     } else {
-      mesgResultado += `<br>⚠️ Você precisa de <strong>${resultado}</strong> na 4a nota para passar.`;
+      mesgResultado += `<br>⚠️ Você precisa de <strong>${resultado}</strong> na ${notaVazia+1}ª nota para passar na média (${notaMin}).`;
     }
   } else {
     resultado = calcFinal(notas, pesos, notaMin);
-    console.log(resultado);
-    mesgResultado = `📊 Sua média: <strong>${resultado.media}</strong>`;
+    mesgResultado = `📊 Sua média: <strong>${Math.round(resultado.media)}</strong>`;
     if (resultado.media < 60) {
       if (resultado.notaFinal > 100) {
-        mesgResultado += `<br>⚠️ Você foi <strong>reprovado!</strong>`;
+        mesgResultado += `<br>⛔ Você foi <strong>reprovado!</strong>`;
       } else {
-        mesgResultado += `<br>⚠️ Você precisa de <strong>${resultado.notaFinal}</strong> na Prova Final para passar.`;
+        mesgResultado += `<br>⚠️ Você precisa de <strong>${Math.round(resultado.notaFinal)}</strong> na Prova Final para passar.`;
       }
     } else {
       mesgResultado += "<br>✅ Parabéns! Você foi aprovado.";
     }
   }
-
   document.getElementById("resultado").innerHTML = mesgResultado;
 });

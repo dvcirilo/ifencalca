@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1180" height="1180" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1180" height="1180" fill="white"/>
+  <g fill="#2f9e41">
+    <!-- Criando os quadrados -->
+    <script>
+      <![CDATA[
+        let svgNS = "http://www.w3.org/2000/svg";
+        let container = document.querySelector('g');
+        let size = 100;
+        let spacing = 20;
+        let radius = 10;
+        let circleRadius = 55;
+        let circleColor = "#cd191e";
+        let positions = [];
+        let circlePositions = new Set();
+
+        for (let row = 0; row < 9; row++) {
+          for (let col = 0; col < 9; col++) {
+            let x = col * (size + spacing);
+            let y = row * (size + spacing);
+            positions.push({ x, y, row, col });
+          }
+        }
+
+        // Selecionando posições para os círculos
+        let circleCount = Math.floor(Math.random() * 10) + 5; // Entre 5 e 10 círculos
+        while (circlePositions.size < circleCount) {
+          let index = Math.floor(Math.random() * positions.length);
+          circlePositions.add(index);
+        }
+
+        for (let i = 0; i < positions.length; i++) {
+          let { x, y } = positions[i];
+
+          if (circlePositions.has(i)) {
+            let circle = document.createElementNS(svgNS, "circle");
+            circle.setAttribute("cx", x + size / 2);
+            circle.setAttribute("cy", y + size / 2);
+            circle.setAttribute("r", circleRadius / 2);
+            circle.setAttribute("fill", circleColor);
+            container.appendChild(circle);
+          } else {
+            let rect = document.createElementNS(svgNS, "rect");
+            rect.setAttribute("x", x);
+            rect.setAttribute("y", y);
+            rect.setAttribute("width", size);
+            rect.setAttribute("height", size);
+            rect.setAttribute("rx", radius);
+            rect.setAttribute("ry", radius);
+            rect.setAttribute("fill", "#2f9e41");
+            container.appendChild(rect);
+          }
+        }
+      ]]>
+    </script>
+  </g>
+</svg>
